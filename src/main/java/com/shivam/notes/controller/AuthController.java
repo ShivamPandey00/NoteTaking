@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/notes/auth")
@@ -42,6 +44,21 @@ public class AuthController {
         userRepository.save(userNotes);
         String message = "User registered successfully!" + userNotes.getUsername();
         return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/userdetails")
+    public ResponseEntity<?> getUserDetails() {
+        // Get the authenticated user's username from SecurityContext
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Fetch user details from the database
+        Optional<UserNotes> user = userRepository.findByUsername(username);
+
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
     }
 
 

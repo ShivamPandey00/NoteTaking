@@ -12,24 +12,9 @@ import javax.persistence.Id;
 public class UserNotes {
 
     @Id
-    String username;
-    String password;
+    private String username;
+    private String password;
+    private String name;
+    private String email;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
