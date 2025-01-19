@@ -1,14 +1,28 @@
-# Use a minimal Java runtime image to run the application
-FROM eclipse-temurin:8-jre
+# Build Stage
+FROM maven:3.8.4-openjdk-8 AS build
 
-# Set the working directory for the application
 WORKDIR /app
 
-# Copy the JAR file from your local target directory into the container
-COPY target/notes-0.0.1-SNAPSHOT.jar app.jar
+# Copy pom.xml and download dependencies to cache them
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expose the default Spring Boot port (8080)
+# Copy the source code into the container
+COPY src/ ./src
+
+# Build the application and skip tests
+RUN mvn clean package -DskipTests
+
+# Runtime Stage
+FROM openjdk:8-jdk-slim
+
+WORKDIR /app
+
+# Copy the built JAR from the build stage
+COPY --from=build /app/target/notes-0.0.1-SNAPSHOT.jar /app/notes-0.0.1-SNAPSHOT.jar
+
+# Expose the application port
 EXPOSE 8080
 
 # Command to run the application
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/notes-0.0.1-SNAPSHOT.jar"]
