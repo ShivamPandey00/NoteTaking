@@ -2,6 +2,7 @@ package com.shivam.notes.configs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,13 +56,15 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.addAllowedOrigin(frontendUrl); // Frontend origin
         corsConfiguration.addAllowedOrigin("http://localhost:3000"); // Frontend origin
-        corsConfiguration.addAllowedOrigin("http://localhost:5173"); // Frontend origin
         corsConfiguration.addAllowedHeader("*"); // Allow all headers
         corsConfiguration.addAllowedMethod("*"); // Allow all methods
         corsConfiguration.setMaxAge(3600L);
